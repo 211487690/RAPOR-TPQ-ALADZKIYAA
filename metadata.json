@@ -1,0 +1,6 @@
+{
+  "name": "RAPOR TPQ AL-ADZKIYAA’",
+  "description": "Sistem Informasi Pengelolaan Data Santri, Penilaian Hasil Belajar, Kenaikan Jilid & Kelas, serta Cetak Rapor dan Piagam Penghargaan TPQ Al-Adzkiyaa’",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
