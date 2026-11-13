@@ -138,151 +138,207 @@ export const pdfService = {
     doc.text(`Tahun Pelajaran ${data.tahun.tahun} - Semester ${data.semester}`, pageWidth / 2, y, { align: 'center' });
 
     y += 5.5;
-    // Box Identitas Santri
-    doc.setFillColor(248, 250, 252);
-    doc.setDrawColor(203, 213, 225);
-    doc.roundedRect(margin, y, contentWidth, 24, 1.5, 1.5, 'FD');
-
+    // Box Identitas Santri (dynamic height to prevent overflow)
     const col1 = margin + 3.5;
-    const col2 = margin + 32;
+    const col2 = margin + 31;
     const col3 = margin + contentWidth / 2 + 3.5;
-    const col4 = col3 + 32;
+    const col4 = col3 + 31;
+    const leftValMaxW = contentWidth / 2 - 34;
+    const rightValMaxW = contentWidth / 2 - 34;
 
     doc.setFontSize(7.8);
+    const namaLines = doc.splitTextToSize(data.santri.namaLengkap || '-', leftValMaxW);
+    const kelasLines = doc.splitTextToSize(data.kelas?.namaKelas || 'Umum', rightValMaxW);
+    const row1Lines = Math.max(namaLines.length, kelasLines.length);
+
+    const nisLines = doc.splitTextToSize(data.santri.nis || '-', leftValMaxW);
+    const ustadzLines = doc.splitTextToSize(data.ustadz?.nama || '-', rightValMaxW);
+    const row2Lines = Math.max(nisLines.length, ustadzLines.length);
+
+    const metodeLines = doc.splitTextToSize(`${data.metode?.nama || 'Bilqolam'} - ${data.jilidNama}`, leftValMaxW);
+    const semLines = doc.splitTextToSize(`${data.semester} (${data.tahun.tahun})`, rightValMaxW);
+    const row3Lines = Math.max(metodeLines.length, semLines.length);
+
+    const rankText = data.ranking && data.ranking > 0
+      ? `Ke-${data.ranking} dari ${data.totalSantriKelas || 0} Santri`
+      : 'Belum Ditentukan';
+    const rankLines = doc.splitTextToSize(rankText, rightValMaxW);
+    const row4Lines = Math.max(1, rankLines.length);
+
+    const lineStep = 3.5;
+    const rowGap = 1.6;
+    const row1Y = y + 4.5;
+    const row2Y = row1Y + row1Lines * lineStep + rowGap;
+    const row3Y = row2Y + row2Lines * lineStep + rowGap;
+    const row4Y = row3Y + row3Lines * lineStep + rowGap;
+    const idBoxH = Math.max(24, (row4Y - y) + row4Lines * lineStep + 1.8);
+
+    doc.setFillColor(248, 250, 252);
+    doc.setDrawColor(203, 213, 225);
+    doc.roundedRect(margin, y, contentWidth, idBoxH, 1.5, 1.5, 'FD');
+
+    // Row 1
+    doc.setFont('helvetica', 'normal');
     doc.setTextColor(71, 85, 105);
-    doc.text('Nama Lengkap', col1, y + 4.5);
-    doc.text(':', col1 + 25, y + 4.5);
+    doc.text('Nama Lengkap', col1, row1Y);
+    doc.text(':', col1 + 24, row1Y);
     doc.setTextColor(15, 23, 42);
     doc.setFont('helvetica', 'bold');
-    doc.text(data.santri.namaLengkap, col2, y + 4.5);
+    namaLines.forEach((ln: string, i: number) => doc.text(ln, col2, row1Y + i * lineStep));
 
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(71, 85, 105);
-    doc.text('Nomor Induk (NIS)', col1, y + 9.5);
-    doc.text(':', col1 + 25, y + 9.5);
+    doc.text('Kelas / Halaqoh', col3, row1Y);
+    doc.text(':', col3 + 24, row1Y);
     doc.setTextColor(15, 23, 42);
-    doc.text(data.santri.nis, col2, y + 9.5);
+    kelasLines.forEach((ln: string, i: number) => doc.text(ln, col4, row1Y + i * lineStep));
+
+    // Row 2
+    doc.setTextColor(71, 85, 105);
+    doc.text('Nomor Induk (NIS)', col1, row2Y);
+    doc.text(':', col1 + 24, row2Y);
+    doc.setTextColor(15, 23, 42);
+    nisLines.forEach((ln: string, i: number) => doc.text(ln, col2, row2Y + i * lineStep));
 
     doc.setTextColor(71, 85, 105);
-    doc.text('Metode / Jilid', col1, y + 14.5);
-    doc.text(':', col1 + 25, y + 14.5);
+    doc.text('Wali / Pengampu', col3, row2Y);
+    doc.text(':', col3 + 24, row2Y);
     doc.setTextColor(15, 23, 42);
-    doc.text(`${data.metode?.nama || 'Bilqolam'} - ${data.jilidNama}`, col2, y + 14.5);
+    ustadzLines.forEach((ln: string, i: number) => doc.text(ln, col4, row2Y + i * lineStep));
+
+    // Row 3
+    doc.setTextColor(71, 85, 105);
+    doc.text('Metode / Jilid', col1, row3Y);
+    doc.text(':', col1 + 24, row3Y);
+    doc.setTextColor(15, 23, 42);
+    metodeLines.forEach((ln: string, i: number) => doc.text(ln, col2, row3Y + i * lineStep));
 
     doc.setTextColor(71, 85, 105);
-    doc.text('Status Santri', col1, y + 19.5);
-    doc.text(':', col1 + 25, y + 19.5);
+    doc.text('Semester / Tahun', col3, row3Y);
+    doc.text(':', col3 + 24, row3Y);
+    doc.setTextColor(15, 23, 42);
+    semLines.forEach((ln: string, i: number) => doc.text(ln, col4, row3Y + i * lineStep));
+
+    // Row 4
+    doc.setTextColor(71, 85, 105);
+    doc.text('Status Santri', col1, row4Y);
+    doc.text(':', col1 + 24, row4Y);
     doc.setTextColor(5, 150, 105);
     doc.setFont('helvetica', 'bold');
-    doc.text(data.santri.status.toUpperCase(), col2, y + 19.5);
+    doc.text(data.santri.status.toUpperCase(), col2, row4Y);
 
-    // Right side
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(71, 85, 105);
-    doc.text('Kelas / Halaqoh', col3, y + 4.5);
-    doc.text(':', col3 + 25, y + 4.5);
-    doc.setTextColor(15, 23, 42);
-    doc.text(data.kelas?.namaKelas || 'Umum', col4, y + 4.5);
-
-    doc.setTextColor(71, 85, 105);
-    doc.text('Wali / Pengampu', col3, y + 9.5);
-    doc.text(':', col3 + 25, y + 9.5);
-    doc.setTextColor(15, 23, 42);
-    doc.text(data.ustadz?.nama || '-', col4, y + 9.5);
-
-    doc.setTextColor(71, 85, 105);
-    doc.text('Semester / Tahun', col3, y + 14.5);
-    doc.text(':', col3 + 25, y + 14.5);
-    doc.setTextColor(15, 23, 42);
-    doc.text(`${data.semester} (${data.tahun.tahun})`, col4, y + 14.5);
-
-    // Official Ranking Display on Rapor
-    doc.setTextColor(71, 85, 105);
-    doc.text('Peringkat Kelas', col3, y + 19.5);
-    doc.text(':', col3 + 25, y + 19.5);
-    doc.setTextColor(217, 119, 6); // amber-600
+    doc.text('Peringkat Kelas', col3, row4Y);
+    doc.text(':', col3 + 24, row4Y);
+    doc.setTextColor(217, 119, 6);
     doc.setFont('helvetica', 'bold');
-    doc.text(
-      data.ranking && data.ranking > 0
-        ? `Ke-${data.ranking} dari ${data.totalSantriKelas || 0} Santri`
-        : 'Belum Ditentukan',
-      col4,
-      y + 19.5
-    );
+    rankLines.forEach((ln: string, i: number) => doc.text(ln, col4, row4Y + i * lineStep));
 
-    y += 28;
+    y += idBoxH + 4;
 
-    // --- TABEL PENILAIAN HASIL BELAJAR ---
+    // --- TABEL PENILAIAN HASIL BELAJAR (Strict Column Widths + Multi-line Wrapping) ---
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(9);
     doc.setTextColor(15, 23, 42);
     doc.text('A. PENILAIAN HASIL BELAJAR', margin, y);
 
     y += 2.5;
-    // Table Header
-    const rowH = 5.8;
+    // Balanced column layout summing to 182mm (contentWidth)
+    const cNoX = margin + 4;          // col width 8mm (0..8)
+    const cNamaX = margin + 10;       // col width 62mm (8..70) -> maxW 58mm
+    const cBobotX = margin + 77.5;    // col width 15mm (70..85)
+    const cNilaiX = margin + 92.5;    // col width 15mm (85..100)
+    const cPredX = margin + 108;      // col width 16mm (100..116)
+    const cKetX = margin + 118.5;     // col width 66mm (116..182) -> maxW 61mm
+    const namaMaxW = 58;
+    const ketMaxW = 61;
+
+    const headerH = 6;
     doc.setFillColor(16, 185, 129); // emerald 500
-    doc.rect(margin, y, contentWidth, rowH, 'F');
+    doc.rect(margin, y, contentWidth, headerH, 'F');
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(7.8);
     doc.setTextColor(255, 255, 255);
 
-    doc.text('No', margin + 3, y + 4);
-    doc.text('Komponen Penilaian', margin + 11, y + 4);
-    doc.text('Bobot', margin + 92, y + 4, { align: 'center' });
-    doc.text('Nilai', margin + 112, y + 4, { align: 'center' });
-    doc.text('Predikat', margin + 132, y + 4, { align: 'center' });
-    doc.text('Keterangan / Catatan', margin + 148, y + 4);
+    doc.text('No', cNoX, y + 4.1, { align: 'center' });
+    doc.text('Komponen Penilaian', cNamaX, y + 4.1);
+    doc.text('Bobot', cBobotX, y + 4.1, { align: 'center' });
+    doc.text('Nilai', cNilaiX, y + 4.1, { align: 'center' });
+    doc.text('Predikat', cPredX, y + 4.1, { align: 'center' });
+    doc.text('Keterangan / Catatan', cKetX, y + 4.1);
 
-    y += rowH;
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(7.8);
+    y += headerH;
+    doc.setFontSize(7.6);
+    const tblLineH = 3.5;
 
     data.scores.items.forEach((item, index) => {
+      doc.setFont('helvetica', 'normal');
+      const compLines = doc.splitTextToSize(item.nama || '-', namaMaxW);
+      const noteLines = doc.splitTextToSize(item.catatan || '-', ketMaxW);
+      const maxLines = Math.max(1, compLines.length, noteLines.length);
+      const dynRowH = Math.max(6, maxLines * tblLineH + 2.5);
+
       const isEven = index % 2 === 0;
       doc.setFillColor(isEven ? 255 : 248, isEven ? 255 : 250, isEven ? 255 : 252);
-      doc.rect(margin, y, contentWidth, rowH, 'F');
+      doc.rect(margin, y, contentWidth, dynRowH, 'F');
       doc.setDrawColor(226, 232, 240);
-      doc.rect(margin, y, contentWidth, rowH, 'S');
+      doc.rect(margin, y, contentWidth, dynRowH, 'S');
+
+      const textTopY = y + 4;
+      doc.setTextColor(71, 85, 105);
+      doc.text(String(index + 1), cNoX, textTopY, { align: 'center' });
+
+      doc.setTextColor(15, 23, 42);
+      compLines.forEach((ln: string, li: number) => {
+        doc.text(ln, cNamaX, textTopY + li * tblLineH);
+      });
 
       doc.setTextColor(71, 85, 105);
-      doc.text(String(index + 1), margin + 3, y + 4);
-      doc.setTextColor(15, 23, 42);
-      doc.text(item.nama, margin + 11, y + 4);
-      doc.setTextColor(71, 85, 105);
-      doc.text(`${item.bobot}%`, margin + 92, y + 4, { align: 'center' });
+      doc.text(`${item.bobot}%`, cBobotX, textTopY, { align: 'center' });
+
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(15, 23, 42);
-      doc.text(String(item.nilai), margin + 112, y + 4, { align: 'center' });
+      doc.text(String(item.nilai), cNilaiX, textTopY, { align: 'center' });
+
       doc.setTextColor(5, 150, 105);
-      doc.text(item.predikat, margin + 132, y + 4, { align: 'center' });
+      doc.text(item.predikat, cPredX, textTopY, { align: 'center' });
+
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(100, 116, 139);
-      doc.text(doc.splitTextToSize(item.catatan || '-', 40)[0] || '-', margin + 148, y + 4);
+      noteLines.forEach((ln: string, li: number) => {
+        doc.text(ln, cKetX, textTopY + li * tblLineH);
+      });
 
-      y += rowH;
+      y += dynRowH;
     });
 
-    // Baris Rata-Rata & Nilai Akhir
-    doc.setFillColor(241, 245, 249);
-    doc.rect(margin, y, contentWidth, rowH + 0.5, 'FD');
+    // Baris Rata-Rata & Nilai Akhir (Wrap label & rank neatly if too long)
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8);
+    doc.setFontSize(7.6);
+    const summaryText = `${data.scores.label}${data.ranking && data.ranking > 0 ? ` (Peringkat ${data.ranking}/${data.totalSantriKelas})` : ''}`;
+    const summaryLines = doc.splitTextToSize(summaryText, ketMaxW);
+    const sumRowH = Math.max(6.8, summaryLines.length * tblLineH + 3.0);
+
+    doc.setFillColor(241, 245, 249);
+    doc.setDrawColor(203, 213, 225);
+    doc.rect(margin, y, contentWidth, sumRowH, 'FD');
+
+    const sumTextY = y + 4.4;
     doc.setTextColor(15, 23, 42);
-    doc.text('NILAI AKHIR / RATA-RATA', margin + 11, y + 4.5);
-    doc.text('100%', margin + 92, y + 4.5, { align: 'center' });
+    doc.text('NILAI AKHIR / RATA-RATA', cNamaX, sumTextY);
+    doc.text('100%', cBobotX, sumTextY, { align: 'center' });
     doc.setTextColor(5, 150, 105);
-    doc.text(String(data.scores.rataRata), margin + 112, y + 4.5, { align: 'center' });
-    doc.text(data.scores.predikat, margin + 132, y + 4.5, { align: 'center' });
-    doc.text(
-      `${data.scores.label}${data.ranking && data.ranking > 0 ? ` (Peringkat ${data.ranking}/${data.totalSantriKelas})` : ''}`,
-      margin + 148,
-      y + 4.5
-    );
+    doc.text(String(data.scores.rataRata), cNilaiX, sumTextY, { align: 'center' });
+    doc.text(data.scores.predikat, cPredX, sumTextY, { align: 'center' });
 
-    y += rowH + 5;
+    summaryLines.forEach((ln: string, li: number) => {
+      doc.text(ln, cKetX, sumTextY + li * tblLineH);
+    });
 
-    // --- CAPAIAN & KETIDAKHADIRAN ---
+    y += sumRowH + 5;
+
+    // --- CAPAIAN & KETIDAKHADIRAN (Dynamic Height & Full Wrapping Inside Boxes) ---
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(9);
     doc.setTextColor(15, 23, 42);
@@ -290,61 +346,120 @@ export const pdfService = {
 
     y += 2.5;
     const boxW = (contentWidth - 5) / 2;
+    const innerBoxMaxW = boxW - 7;
+    const bLineH = 3.6;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.6);
+    const hafalanText = `• Hafalan: ${data.catatanRapor?.capaianHafalan || 'Sesuai kurikulum target tingkat'}`;
+    const ibadahText = `• Ibadah: ${data.catatanRapor?.capaianIbadah || 'Praktik sholat dan doa harian aktif'}`;
+    const hafalanLines = doc.splitTextToSize(hafalanText, innerBoxMaxW);
+    const ibadahLines = doc.splitTextToSize(ibadahText, innerBoxMaxW);
+
+    const absensiText = `Sakit: ${data.catatanRapor?.sakit || 0} hari  |  Izin: ${data.catatanRapor?.izin || 0} hari  |  Alpa: ${data.catatanRapor?.tanpaKeterangan || 0} hari`;
+    const absensiLines = doc.splitTextToSize(absensiText, innerBoxMaxW);
+
+    const keputusanVal = data.catatanRapor?.keputusanKenaikanKelas && data.catatanRapor.keputusanKenaikanKelas !== 'Belum Ditentukan'
+      ? data.catatanRapor.keputusanKenaikanKelas
+      : `Lulus Naik Jilid / Tingkat Selanjutnya (${data.jilidNama})`;
+    const keputusanLines = doc.splitTextToSize(keputusanVal, innerBoxMaxW);
+
+    const leftBoxNeededH = 9.5 + hafalanLines.length * bLineH + 1.5 + ibadahLines.length * bLineH + 2.5;
+    const rightBoxNeededH = 9.5 + absensiLines.length * bLineH + 5 + keputusanLines.length * bLineH + 2.5;
+    const boxH = Math.max(24, leftBoxNeededH, rightBoxNeededH);
+
     doc.setDrawColor(226, 232, 240);
     doc.setFillColor(255, 255, 255);
-    doc.roundedRect(margin, y, boxW, 23, 1.5, 1.5, 'FD');
-    doc.roundedRect(margin + boxW + 5, y, boxW, 23, 1.5, 1.5, 'FD');
+    doc.roundedRect(margin, y, boxW, boxH, 1.5, 1.5, 'FD');
+    doc.roundedRect(margin + boxW + 5, y, boxW, boxH, 1.5, 1.5, 'FD');
 
     // Box Capaian
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(7.8);
     doc.setTextColor(5, 150, 105);
-    doc.text('Capaian Materi & Target:', margin + 3.5, y + 4.5);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(51, 65, 85);
-    doc.text(`• Hafalan: ${data.catatanRapor?.capaianHafalan || 'Sesuai kurikulum target tingkat'}`, margin + 3.5, y + 9.5, { maxWidth: boxW - 7 });
-    doc.text(`• Ibadah: ${data.catatanRapor?.capaianIbadah || 'Praktik sholat dan doa harian aktif'}`, margin + 3.5, y + 16, { maxWidth: boxW - 7 });
+    doc.text('Capaian Materi & Target:', margin + 3.5, y + 4.8);
 
-    // Box Kehadiran & Kenaikan
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.6);
+    doc.setTextColor(51, 65, 85);
+    let leftCurY = y + 9.5;
+    hafalanLines.forEach((ln: string) => {
+      doc.text(ln, margin + 3.5, leftCurY);
+      leftCurY += bLineH;
+    });
+    leftCurY += 1.2;
+    ibadahLines.forEach((ln: string) => {
+      doc.text(ln, margin + 3.5, leftCurY);
+      leftCurY += bLineH;
+    });
+
+    // Box Kehadiran & Keputusan
+    const rightBoxX = margin + boxW + 8.5;
     doc.setFont('helvetica', 'bold');
+    doc.setFontSize(7.8);
     doc.setTextColor(5, 150, 105);
-    doc.text('Kehadiran (Absensi) Semester Ini:', margin + boxW + 8.5, y + 4.5);
+    doc.text('Kehadiran (Absensi) Semester Ini:', rightBoxX, y + 4.8);
+
     doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.6);
     doc.setTextColor(51, 65, 85);
-    doc.text(`Sakit: ${data.catatanRapor?.sakit || 0} hari  |  Izin: ${data.catatanRapor?.izin || 0} hari  |  Alpa: ${data.catatanRapor?.tanpaKeterangan || 0} hari`, margin + boxW + 8.5, y + 9.5);
+    let rightCurY = y + 9.5;
+    absensiLines.forEach((ln: string) => {
+      doc.text(ln, rightBoxX, rightCurY);
+      rightCurY += bLineH;
+    });
+
+    rightCurY += 1.8;
     doc.setFont('helvetica', 'bold');
-    doc.text('Keputusan:', margin + boxW + 8.5, y + 15.5);
+    doc.setTextColor(51, 65, 85);
+    doc.text('Keputusan:', rightBoxX, rightCurY);
+    rightCurY += bLineH;
+
     doc.setTextColor(16, 185, 129);
-    doc.text(
-      data.catatanRapor?.keputusanKenaikanKelas && data.catatanRapor.keputusanKenaikanKelas !== 'Belum Ditentukan'
-        ? data.catatanRapor.keputusanKenaikanKelas
-        : `Lulus Naik Jilid / Tingkat Selanjutnya (${data.jilidNama})`,
-      margin + boxW + 25,
-      y + 15.5
-    );
+    keputusanLines.forEach((ln: string) => {
+      doc.text(ln, rightBoxX, rightCurY);
+      rightCurY += bLineH;
+    });
 
-    y += 28;
+    y += boxH + 5;
 
-    // --- CATATAN & MOTIVASI ---
+    // --- CATATAN & MOTIVASI (Dynamic Height) ---
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(9);
     doc.setTextColor(15, 23, 42);
     doc.text('C. CATATAN & MOTIVASI USTADZ / KEPALA TPQ', margin, y);
 
     y += 2.5;
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(7.6);
+    const quote = data.catatanRapor?.catatanWali || 'Terus istiqomah dalam membaca, mempelajari, dan mengamalkan Al-Qur\'anul Karim.';
+    const waliQuoteLines = doc.splitTextToSize(`"${quote}"`, contentWidth - 7);
+    const kepalaQuoteLines = data.catatanRapor?.catatanKepala
+      ? doc.splitTextToSize(`Pesan Pengasuh: "${data.catatanRapor.catatanKepala}"`, contentWidth - 7)
+      : [];
+
+    const noteContentH = waliQuoteLines.length * 3.7 + (kepalaQuoteLines.length > 0 ? 1.5 + kepalaQuoteLines.length * 3.7 : 0);
+    const noteBoxH = Math.max(15, noteContentH + 6);
+
     doc.setDrawColor(226, 232, 240);
     doc.setFillColor(248, 250, 252);
-    doc.roundedRect(margin, y, contentWidth, 16, 1.5, 1.5, 'FD');
-    doc.setFont('helvetica', 'italic');
-    doc.setFontSize(7.8);
+    doc.roundedRect(margin, y, contentWidth, noteBoxH, 1.5, 1.5, 'FD');
+
     doc.setTextColor(71, 85, 105);
-    const quote = data.catatanRapor?.catatanWali || 'Terus istiqomah dalam membaca, mempelajari, dan mengamalkan Al-Qur\'anul Karim.';
-    doc.text(`"${quote}"`, margin + 3.5, y + 5.5, { maxWidth: contentWidth - 7 });
-    if (data.catatanRapor?.catatanKepala) {
-      doc.text(`Pesan Pengasuh: "${data.catatanRapor.catatanKepala}"`, margin + 3.5, y + 11.5, { maxWidth: contentWidth - 7 });
+    let noteY = y + 5;
+    waliQuoteLines.forEach((ln: string) => {
+      doc.text(ln, margin + 3.5, noteY);
+      noteY += 3.7;
+    });
+    if (kepalaQuoteLines.length > 0) {
+      noteY += 1.2;
+      kepalaQuoteLines.forEach((ln: string) => {
+        doc.text(ln, margin + 3.5, noteY);
+        noteY += 3.7;
+      });
     }
 
-    y += 21;
+    y += noteBoxH + 5;
 
     // --- PENGESAHAN / TANDA TANGAN & QR VALIDASI RESMI ---
     const tglCetak = data.semester === 'Ganjil' ? data.tahun.tanggalRaporGanjil : data.tahun.tanggalRaporGenap;
@@ -368,30 +483,30 @@ export const pdfService = {
 
     if (qrDataUrl) {
       try {
-        doc.addImage(qrDataUrl, 'PNG', sigCol3 - 8, y + 2.5, 16, 16);
+        doc.addImage(qrDataUrl, 'PNG', sigCol3 - 7.5, y + 2.5, 15, 15);
       } catch (err) {
         console.warn('QR code failed in PDF:', err);
       }
     }
 
-    y += 16;
+    y += 20;
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(7.5);
+    doc.setFontSize(7.3);
     doc.setTextColor(15, 23, 42);
-    doc.text('( .................................... )', sigCol1, y, { align: 'center' });
-    doc.text(`( ${data.ustadz?.nama || 'Ustadz Pembimbing'} )`, sigCol2, y, { align: 'center' });
+    doc.text('( .............................. )', sigCol1, y, { align: 'center' });
+    doc.text(`( ${data.ustadz?.nama || 'Ustadz Pembimbing'} )`, sigCol2, y, { align: 'center', maxWidth: 40 });
 
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(5.5);
+    doc.setFontSize(5.8);
     doc.setTextColor(100, 116, 139);
-    doc.text(`Scan QR Validasi Digital`, sigCol3, y + 2, { align: 'center' });
+    doc.text('Scan QR Validasi Digital', sigCol3, y, { align: 'center' });
 
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(7.5);
+    doc.setFontSize(7.3);
     doc.setTextColor(15, 23, 42);
-    doc.text(`( ${data.lembaga.kepalaTpq} )`, sigCol4, y, { align: 'center' });
+    doc.text(`( ${data.lembaga.kepalaTpq} )`, sigCol4, y, { align: 'center', maxWidth: 40 });
 
-    y += 3.5;
+    y += 4;
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(6.8);
     doc.setTextColor(148, 163, 184);
@@ -401,7 +516,7 @@ export const pdfService = {
 
     // Footnote
     doc.setFontSize(7.5);
-    doc.text(data.lembaga.footnote, pageWidth / 2, 288, { align: 'center' });
+    doc.text(data.lembaga.footnote, pageWidth / 2, Math.max(288, Math.min(292, y + 6)), { align: 'center' });
   },
 
   // 1. Generate Single Rapor PDF

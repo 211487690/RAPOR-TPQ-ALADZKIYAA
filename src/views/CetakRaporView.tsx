@@ -340,38 +340,39 @@ export const CetakRaporView: React.FC<CetakRaporViewProps> = ({
             </p>
           </div>
 
-          {/* Identitas Santri Box - Strict CSS Grid & Containment */}
-          <div className="rapor-grid bg-slate-50 border border-slate-300 rounded-lg p-3 grid grid-cols-2 gap-x-6 gap-y-1.5 text-[11px] overflow-hidden break-inside-avoid">
-            <div className="flex items-center min-w-0">
+          {/* Identitas Santri Box - Strict CSS Grid & Wrapping */}
+          <div className="rapor-grid bg-slate-50 border border-slate-300 rounded-lg p-3 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5 text-[11px] overflow-hidden break-inside-avoid">
+            <div className="flex items-start min-w-0">
               <span className="w-28 shrink-0 text-slate-500">Nama Lengkap</span>
-              <span className="font-bold text-slate-900 truncate">: {previewData.santri.namaLengkap}</span>
+              <span className="font-bold text-slate-900 break-words min-w-0 flex-1">: {previewData.santri.namaLengkap}</span>
             </div>
-            <div className="flex items-center min-w-0">
+            <div className="flex items-start min-w-0">
               <span className="w-28 shrink-0 text-slate-500">Kelas / Halaqoh</span>
-              <span className="font-semibold text-slate-900 truncate">: {previewData.kelas?.namaKelas || 'Umum'}</span>
+              <span className="font-semibold text-slate-900 break-words min-w-0 flex-1">: {previewData.kelas?.namaKelas || 'Umum'}</span>
             </div>
-            <div className="flex items-center min-w-0">
+            <div className="flex items-start min-w-0">
               <span className="w-28 shrink-0 text-slate-500">Nomor Induk (NIS)</span>
-              <span className="font-mono text-slate-900 truncate">: {previewData.santri.nis}</span>
+              <span className="font-mono text-slate-900 break-words min-w-0 flex-1">: {previewData.santri.nis}</span>
             </div>
-            <div className="flex items-center min-w-0">
+            <div className="flex items-start min-w-0">
               <span className="w-28 shrink-0 text-slate-500">Wali / Pengampu</span>
-              <span className="text-slate-900 truncate">: {previewData.ustadz?.nama || '-'}</span>
+              <span className="text-slate-900 break-words min-w-0 flex-1">: {previewData.ustadz?.nama || '-'}</span>
             </div>
-            <div className="flex items-center min-w-0">
+            <div className="flex items-start min-w-0">
               <span className="w-28 shrink-0 text-slate-500">Metode / Jilid</span>
-              <span className="font-semibold text-emerald-800 truncate">
+              <span className="font-semibold text-emerald-800 break-words min-w-0 flex-1">
                 : {previewData.metode?.nama} - {previewData.jilidNama}
               </span>
             </div>
-            <div className="flex items-center min-w-0">
+            <div className="flex items-start min-w-0">
               <span className="w-28 shrink-0 text-slate-500">Status Santri</span>
-              <span className="font-bold uppercase text-emerald-700 truncate">: {previewData.santri.status}</span>
+              <span className="font-bold uppercase text-emerald-700 break-words min-w-0 flex-1">: {previewData.santri.status}</span>
             </div>
-            <div className="flex items-center col-span-2 pt-1 border-t border-slate-200">
+            <div className="flex items-center sm:col-span-2 pt-1 border-t border-slate-200 flex-wrap gap-1">
               <span className="w-28 shrink-0 text-slate-500">Peringkat Kelas</span>
-              <span className="font-bold text-amber-700 flex items-center gap-1.5 truncate">
-                : {previewData.ranking && previewData.ranking > 0 ? (
+              <span className="font-bold text-amber-700 flex flex-wrap items-center gap-1.5 min-w-0 flex-1">
+                <span>:</span>
+                {previewData.ranking && previewData.ranking > 0 ? (
                   <>
                     <span className="px-1.5 py-0.5 bg-amber-100 text-amber-900 border border-amber-300 rounded text-[10px] font-bold">
                       Peringkat Ke-{previewData.ranking}
@@ -385,7 +386,7 @@ export const CetakRaporView: React.FC<CetakRaporViewProps> = ({
             </div>
           </div>
 
-          {/* A. Penilaian Hasil Belajar - Strict Table Layout */}
+          {/* A. Penilaian Hasil Belajar - Strict Table Layout with Multi-line Wrapping */}
           <div className="space-y-1.5 break-inside-avoid">
             <h4 className="font-bold text-slate-900 text-xs tracking-wide">
               A. PENILAIAN HASIL BELAJAR
@@ -393,12 +394,12 @@ export const CetakRaporView: React.FC<CetakRaporViewProps> = ({
             <div className="border border-slate-300 rounded-lg overflow-hidden">
               <table className="rapor-table w-full text-left text-[11px] text-slate-800 table-fixed border-collapse">
                 <colgroup>
-                  <col style={{ width: '6%' }} />
-                  <col style={{ width: '38%' }} />
-                  <col style={{ width: '12%' }} />
-                  <col style={{ width: '12%' }} />
-                  <col style={{ width: '12%' }} />
-                  <col style={{ width: '20%' }} />
+                  <col style={{ width: '5%' }} />
+                  <col style={{ width: '32%' }} />
+                  <col style={{ width: '9%' }} />
+                  <col style={{ width: '9%' }} />
+                  <col style={{ width: '10%' }} />
+                  <col style={{ width: '35%' }} />
                 </colgroup>
                 <thead className="bg-emerald-600 text-white font-semibold">
                   <tr className="rapor-table-row">
@@ -407,22 +408,22 @@ export const CetakRaporView: React.FC<CetakRaporViewProps> = ({
                     <th className="px-2 py-1.5 text-center">Bobot</th>
                     <th className="px-2 py-1.5 text-center">Nilai</th>
                     <th className="px-2 py-1.5 text-center">Predikat</th>
-                    <th className="px-2 py-1.5">Catatan</th>
+                    <th className="px-2 py-1.5">Keterangan / Catatan</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200">
                   {previewData.scores.items.map((item, index) => (
-                    <tr key={item.komponenId} className={`rapor-table-row ${index % 2 === 0 ? 'bg-white' : 'bg-slate-50/70'}`}>
+                    <tr key={item.komponenId} className={`rapor-table-row align-top ${index % 2 === 0 ? 'bg-white' : 'bg-slate-50/70'}`}>
                       <td className="px-2 py-1.5 text-center text-slate-400 font-mono">{index + 1}</td>
-                      <td className="px-2 py-1.5 font-medium text-slate-900 truncate">{item.nama}</td>
+                      <td className="px-2 py-1.5 font-medium text-slate-900 whitespace-normal break-words leading-snug">{item.nama}</td>
                       <td className="px-2 py-1.5 text-center text-slate-500">{item.bobot}%</td>
                       <td className="px-2 py-1.5 text-center font-bold text-slate-900 tabular-nums">{item.nilai}</td>
                       <td className="px-2 py-1.5 text-center font-bold text-emerald-700">{item.predikat}</td>
-                      <td className="px-2 py-1.5 text-slate-600 text-[10px] truncate">{item.catatan || '-'}</td>
+                      <td className="px-2 py-1.5 text-slate-600 text-[10px] whitespace-normal break-words leading-snug">{item.catatan || '-'}</td>
                     </tr>
                   ))}
                   {/* Row Nilai Akhir */}
-                  <tr className="rapor-table-row bg-emerald-50 font-bold text-slate-900 border-t-2 border-emerald-500">
+                  <tr className="rapor-table-row bg-emerald-50 font-bold text-slate-900 border-t-2 border-emerald-500 align-top">
                     <td colSpan={2} className="px-2 py-1.5 text-right uppercase text-[10px]">Nilai Akhir Rata-rata</td>
                     <td className="px-2 py-1.5 text-center">100%</td>
                     <td className="px-2 py-1.5 text-center text-emerald-800 tabular-nums text-xs">
@@ -431,13 +432,15 @@ export const CetakRaporView: React.FC<CetakRaporViewProps> = ({
                     <td className="px-2 py-1.5 text-center text-emerald-800">
                       {previewData.scores.predikat}
                     </td>
-                    <td className="px-2 py-1.5 text-emerald-900 text-[10px] truncate">
-                      <span>{previewData.scores.label}</span>
-                      {previewData.ranking && previewData.ranking > 0 && (
-                        <span className="ml-1 px-1 py-0.5 bg-amber-200 text-amber-900 rounded font-bold text-[9px]">
-                          #{previewData.ranking}
-                        </span>
-                      )}
+                    <td className="px-2 py-1.5 text-emerald-900 text-[10px] whitespace-normal break-words leading-snug">
+                      <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
+                        <span>{previewData.scores.label}</span>
+                        {previewData.ranking && previewData.ranking > 0 && (
+                          <span className="inline-block px-1.5 py-0.5 bg-amber-200 text-amber-900 rounded font-bold text-[9px] whitespace-nowrap">
+                            Peringkat {previewData.ranking}/{previewData.totalSantriKelas || 0}
+                          </span>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 </tbody>
@@ -445,34 +448,37 @@ export const CetakRaporView: React.FC<CetakRaporViewProps> = ({
             </div>
           </div>
 
-          {/* B. Capaian Pembelajaran & Kehadiran - Strict 2-column Grid */}
+          {/* B. Capaian Pembelajaran & Kehadiran - Strict 2-column Grid with Wrapping */}
           <div className="space-y-1.5 break-inside-avoid">
             <h4 className="font-bold text-slate-900 text-xs tracking-wide">
               B. CAPAIAN PEMBELAJARAN &amp; KEHADIRAN
             </h4>
-            <div className="grid grid-cols-2 gap-3 text-[11px] overflow-hidden">
-              <div className="p-2.5 bg-slate-50 border border-slate-300 rounded-lg space-y-1">
-                <span className="font-bold text-emerald-900 block">Capaian Materi Target:</span>
-                <p className="text-slate-700 truncate">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[11px] overflow-hidden">
+              <div className="p-2.5 bg-slate-50 border border-slate-300 rounded-lg space-y-1 min-w-0 overflow-hidden">
+                <span className="font-bold text-emerald-900 block">Capaian Materi &amp; Target:</span>
+                <p className="text-slate-700 whitespace-normal break-words leading-snug">
                   • Hafalan: {previewData.catatanRapor?.capaianHafalan || 'Sesuai kurikulum target tingkat'}
                 </p>
-                <p className="text-slate-700 truncate">
+                <p className="text-slate-700 whitespace-normal break-words leading-snug">
                   • Ibadah: {previewData.catatanRapor?.capaianIbadah || 'Praktik sholat dan doa harian aktif'}
                 </p>
               </div>
 
-              <div className="p-2.5 bg-slate-50 border border-slate-300 rounded-lg space-y-1">
-                <span className="font-bold text-emerald-900 block">Kehadiran &amp; Keputusan:</span>
-                <p className="text-slate-700 truncate">
-                  Sakit: <strong>{previewData.catatanRapor?.sakit || 0}</strong> hr · Izin:{' '}
-                  <strong>{previewData.catatanRapor?.izin || 0}</strong> hr · Alpa:{' '}
-                  <strong>{previewData.catatanRapor?.tanpaKeterangan || 0}</strong> hr
+              <div className="p-2.5 bg-slate-50 border border-slate-300 rounded-lg space-y-1 min-w-0 overflow-hidden">
+                <span className="font-bold text-emerald-900 block">Kehadiran (Absensi) Semester Ini:</span>
+                <p className="text-slate-700 whitespace-normal break-words leading-snug">
+                  Sakit: <strong>{previewData.catatanRapor?.sakit || 0}</strong> hari · Izin:{' '}
+                  <strong>{previewData.catatanRapor?.izin || 0}</strong> hari · Alpa:{' '}
+                  <strong>{previewData.catatanRapor?.tanpaKeterangan || 0}</strong> hari
                 </p>
-                <p className="text-emerald-800 font-bold truncate">
-                  Keputusan: {previewData.catatanRapor?.keputusanKenaikanKelas && previewData.catatanRapor.keputusanKenaikanKelas !== 'Belum Ditentukan'
-                    ? previewData.catatanRapor.keputusanKenaikanKelas
-                    : `Lulus Naik Tingkat Selanjutnya (${previewData.jilidNama})`}
-                </p>
+                <div className="text-slate-800 whitespace-normal break-words leading-snug pt-0.5">
+                  <span className="font-bold block">Keputusan:</span>
+                  <span className="text-emerald-700 font-bold block">
+                    {previewData.catatanRapor?.keputusanKenaikanKelas && previewData.catatanRapor.keputusanKenaikanKelas !== 'Belum Ditentukan'
+                      ? previewData.catatanRapor.keputusanKenaikanKelas
+                      : `Lulus Naik Jilid / Tingkat Selanjutnya (${previewData.jilidNama})`}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -482,11 +488,11 @@ export const CetakRaporView: React.FC<CetakRaporViewProps> = ({
             <h4 className="font-bold text-slate-900 text-xs tracking-wide">
               C. CATATAN &amp; MOTIVASI USTADZ / KEPALA TPQ
             </h4>
-            <div className="p-2.5 bg-slate-50 border border-slate-300 rounded-lg space-y-1 text-[11px] italic text-slate-700">
-              <p className="line-clamp-2">
+            <div className="p-2.5 bg-slate-50 border border-slate-300 rounded-lg space-y-1 text-[11px] italic text-slate-700 overflow-hidden">
+              <p className="whitespace-normal break-words leading-snug">
                 "Wali Kelas: {previewData.catatanRapor?.catatanWali || 'Alhamdulillah, ananda menunjukkan perkembangan membaca yang sangat baik dan tekun dalam menghafal Al-Qur\'an.'}"
               </p>
-              <p className="line-clamp-2">
+              <p className="whitespace-normal break-words leading-snug">
                 "Kepala TPQ: {previewData.catatanRapor?.catatanKepala || 'Barakallah, terus istiqomah dalam membaca dan mengamalkan adab Qur\'ani setiap hari.'}"
               </p>
             </div>
@@ -502,16 +508,16 @@ export const CetakRaporView: React.FC<CetakRaporViewProps> = ({
             </div>
 
             <div className="grid grid-cols-4 text-center gap-2 items-start">
-              <div>
+              <div className="min-w-0">
                 <p className="text-slate-600 font-medium">Orang Tua / Wali Santri</p>
                 <div className="h-14"></div>
-                <p className="font-bold text-slate-900">( .................................... )</p>
+                <p className="font-bold text-slate-900 break-words">( .................................... )</p>
               </div>
 
-              <div>
+              <div className="min-w-0">
                 <p className="text-slate-600 font-medium">Ustadz / Wali Halaqoh</p>
                 <div className="h-14"></div>
-                <p className="font-bold text-slate-900 truncate">
+                <p className="font-bold text-slate-900 whitespace-normal break-words leading-tight">
                   ( {previewData.ustadz?.nama || 'Ustadz Pembimbing'} )
                 </p>
               </div>
@@ -532,11 +538,11 @@ export const CetakRaporView: React.FC<CetakRaporViewProps> = ({
                 <span className="text-[7.5px] text-slate-500 font-mono">Resmi TPQ Al-Adzkiyaa’</span>
               </div>
 
-              <div>
+              <div className="min-w-0">
                 <p className="text-slate-600 font-medium">Mengetahui,</p>
                 <p className="text-slate-600 font-semibold">{lembaga.jabatanPenandatangan}</p>
                 <div className="h-10"></div>
-                <p className="font-bold text-slate-900 truncate">( {lembaga.kepalaTpq} )</p>
+                <p className="font-bold text-slate-900 whitespace-normal break-words leading-tight">( {lembaga.kepalaTpq} )</p>
                 {lembaga.nipKepala && (
                   <p className="text-[9px] text-slate-400">NIP: {lembaga.nipKepala}</p>
                 )}

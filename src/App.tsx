@@ -316,8 +316,8 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans antialiased text-slate-800">
-      {/* Top Header */}
-      <div className="no-print">
+      {/* Top Header - Fixed & Static on Scroll */}
+      <div className="fixed top-0 left-0 right-0 z-40 no-print">
         <Header
           user={userSession}
           lembaga={lembaga}
@@ -330,7 +330,7 @@ export default function App() {
         />
       </div>
 
-      <div className="flex-1 flex relative min-h-0">
+      <div className="flex-1 flex relative min-h-0 pt-14 print:pt-0">
         {/* Navigation Sidebar (Fixed & Static on desktop, drawer on mobile) */}
         <Sidebar
           currentView={currentView}
